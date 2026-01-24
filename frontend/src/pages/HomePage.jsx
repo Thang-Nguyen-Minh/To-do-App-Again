@@ -35,6 +35,10 @@ export const HomePage = () => {
         }
     }
 
+    const handleTaskChanged = () =>{
+        fetchTasks();
+    }
+
     const filteredTask = taskBuffer.filter((task) => {
         if (filter === "active") {
             return task.status==='active'
@@ -62,7 +66,7 @@ export const HomePage = () => {
                     {/*Đầu trang*/}
                     <Header/>
                     {/*Thêm Task*/}
-                    <AddTask/>
+                    <AddTask handleNewTaskAdded={handleTaskChanged}/>
                     {/*Lọc*/}
                     <StatAndFilter
                         filter={filter}
