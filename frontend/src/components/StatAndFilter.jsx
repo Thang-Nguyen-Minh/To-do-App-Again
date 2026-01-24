@@ -4,7 +4,7 @@ import {Badge} from "@/components/ui/badge.jsx";
 import {Button} from "@/components/ui/button.jsx";
 import {Filter} from "lucide-react";
 
-export const StatAndFilter = ({completedTasksCount=0, activeTasksCount=0, filter='all'}) => {
+export const StatAndFilter = ({completedTasksCount=0, activeTasksCount=0, filter='all', setFilter}) => {
     return (
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
             {/*Phần thống kê*/}
@@ -34,6 +34,7 @@ export const StatAndFilter = ({completedTasksCount=0, activeTasksCount=0, filter
                                 variant={filter===type ? "gradient" : "ghost"}
                                 size="sm"
                                 className="capitalize"
+                                onClick={() => setFilter(type)}
                             >
                                 <Filter className="size-4"/>
                                 {FilterType[type]}

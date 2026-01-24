@@ -2,8 +2,23 @@ import Task from "../models/Task.js";
 
 export const getAllTasks = async (req, res) => {
     try{
-        const getTask=await Task.find().sort({createdAt: -1});
-        res.status(200).json(getTask);
+        const getTask=await Task.find({}).sort({createdAt:-1});
+        //Aggregate pipeline để chạy song song cả loadTasks lẫn lọc
+        //count đầu là đếm, count 2 là trả về 1 mảng có key là count
+        const result = await Task.aggregate([{
+            $facet : {
+                tasks : [{$sort: {createdAt:-1}}],
+                activeCount : [{$match : {status : "active"}},{$count : "count"}],
+                completeCount : [{$match : {status : "complete"}},{$count : "count"}],
+            }
+        }])
+        const tasks=result[0].tasks;
+        //?. là thg ở trước tồn tại thì thực hiện thg ở sau
+        //Nếu activeCount[0] tồn tại, nó lấy giá trị .count
+        //Nếu activeCount[0] là undefined, nó sẽ trả về undefined ngay lập tức thay vì báo lỗi, lấy giá trị là 0
+        const activeCount = result[0].activeCount[0]?.count || 0;
+        const completeCount = result[0].completeCount[0]?.count || 0;
+        res.status(200).json({tasks,activeCount,completeCount});
     }
     catch(err){
         console.error("Lỗi khi gọi getAllTasks",err);

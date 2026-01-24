@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Header} from "@/components/Header.jsx";
 import {AddTask} from "@/components/AddTask.jsx";
 import {StatAndFilter} from "@/components/StatAndFilter.jsx";
@@ -6,8 +6,45 @@ import {TaskList} from "@/components/TaskList.jsx";
 import {Pagi} from "@/components/TaskPagination.jsx"
 import {DateTimeFilter} from "@/components/DateTimeFilter.jsx";
 import {Footer} from "@/components/Footer.jsx";
+import {toast} from "sonner";
+import axios from "axios";
 
 export const HomePage = () => {
+    const [taskBuffer,setTaskBuffer] = useState([]);
+    //Hiển thị task đang làm và đã hoàn thành ở bộ lọc
+    const [activeTaskCount,setActiveTaskCount] = useState(0);
+    const [completeTaskCount,setCompleteTaskCount] = useState(0);
+    const [filter, setFilter] = useState("all");
+
+    useEffect(()=>{
+        fetchTasks();
+    },[])
+
+    const fetchTasks = async () => {
+        try{
+            const res = await axios.get("http://localhost:8080/api/tasks");
+            setTaskBuffer(res.data.tasks);
+            setActiveTaskCount(res.data.activeCount);
+            setCompleteTaskCount(res.data.completeCount);
+            console.log(res.data);
+            toast.success("Load Task list successfully.");
+        }
+        catch(err){
+            console.error("Cannot load tasks",err);
+            toast.error("Load tasks unsuccessful",err.message);
+        }
+    }
+
+    const filteredTask = taskBuffer.filter((task) => {
+        if (filter === "active") {
+            return task.status==='active'
+        }
+        else if (filter === "completed") {
+            return task.status==='complete'
+        }
+        else return true;
+    })
+
     return (
         <div className="min-h-screen w-full bg-[#fefcff] relative">
             {/* Dreamy Sky Pink Glow */}
@@ -27,16 +64,24 @@ export const HomePage = () => {
                     {/*Thêm Task*/}
                     <AddTask/>
                     {/*Lọc*/}
-                    <StatAndFilter/>
+                    <StatAndFilter
+                        filter={filter}
+                        setFilter={setFilter}
+                        activeTasksCount={activeTaskCount}
+                        completedTasksCount={completeTaskCount}
+                    />
                     {/*Hiển thị task*/}
-                    <TaskList/>
+                    <TaskList Tasks={filteredTask} trangthaiHienThi={filter}/>
                     {/*Phân trang*/}
                     <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
                         <Pagi/>
                         <DateTimeFilter/>
                     </div>
                     {/*Chân trang*/}
-                    <Footer/>
+                    <Footer
+                        activeTasksCount={activeTaskCount}
+                        completedTasksCount={completeTaskCount}
+                    />
                 </div>
             </div>
         </div>

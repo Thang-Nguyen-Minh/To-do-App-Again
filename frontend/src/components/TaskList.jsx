@@ -2,24 +2,7 @@ import React from "react";
 import {TaskEmptyState} from "@/components/TaskEmptyState.jsx";
 import {TaskCard} from "@/components/TaskCard.jsx";
 
-export const TaskList = () => {
-    let trangthaiHienThi='all'
-    const Tasks=[
-        {
-            id : '1',
-            title : "Học code",
-            status : "active",
-            completedAt: null,
-            createdAt: new Date(),
-        },
-        {
-            id : '2',
-            title : "Học tiếng anh",
-            status : "complete",
-            completedAt: new Date(),
-            createdAt: new Date(),
-        }
-    ]
+export const TaskList = ({Tasks,trangthaiHienThi}) => {
     if (!Tasks || !Tasks.length) {
         return <TaskEmptyState filter={trangthaiHienThi}/>
     }

@@ -2,10 +2,11 @@ import express from 'express';
 import dotenv from 'dotenv';
 import {connectDB} from './config/db.js';
 import taskRoutes from './routes/tasksRouters.js';
-
+import cors from 'cors';
 const app = express();
 dotenv.config();
 const PORT = process.env.PORT || 8080;
+app.use(cors());
 app.use(express.json());//chuyển json sang object cho dễ xử lý
 app.use("/api/tasks", taskRoutes);
 
