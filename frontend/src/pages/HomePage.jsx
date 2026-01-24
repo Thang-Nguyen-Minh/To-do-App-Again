@@ -26,8 +26,6 @@ export const HomePage = () => {
             setTaskBuffer(res.data.tasks);
             setActiveTaskCount(res.data.activeCount);
             setCompleteTaskCount(res.data.completeCount);
-            console.log(res.data);
-            toast.success("Load Task list successfully.");
         }
         catch(err){
             console.error("Cannot load tasks",err);
@@ -75,7 +73,9 @@ export const HomePage = () => {
                         completedTasksCount={completeTaskCount}
                     />
                     {/*Hiển thị task*/}
-                    <TaskList Tasks={filteredTask} trangthaiHienThi={filter}/>
+                    <TaskList Tasks={filteredTask} trangthaiHienThi={filter}
+                              handleTaskChanged={handleTaskChanged}
+                    />
                     {/*Phân trang*/}
                     <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
                         <Pagi/>

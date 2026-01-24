@@ -4,10 +4,24 @@ import {Calendar, CheckCircle, Circle, SquarePen, Trash2} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
 import {cn} from "@/lib/utils.js";
 import {Input} from "@/components/ui/input.jsx";
+import {toast} from "sonner";
+import {api} from "@/lib/axios.js";
 //Tư duy "Nhị phân" (Chỉ cần kiểm tra 1 bên)
 //Coi active là trạng thái mặc định, chỉ cần kiểm tra complete.
-export const TaskCard = ({task,index}) => {
+export const TaskCard = ({task,index,handleTaskChanged}) => {
     let isEditing = false;
+
+    const deleteTask = async (taskId) => {
+        try{
+            await api.delete(`tasks/${taskId}`);
+            toast.success("Task has been deleted");
+            handleTaskChanged();
+        }
+        catch(err){
+            console.error("Delete Task unsuccessful",err);
+            toast.error("Delete Task  unsuccessful",err.message);
+        }
+    }
     return (
         <Card className={cn(
             "p-4 bg-gradient-card mb-4 border-0 shadow-custom-md hover:shadow-custom-lg transition-all duration-200" +
@@ -72,7 +86,9 @@ export const TaskCard = ({task,index}) => {
                     </Button>
                 {/*    Nút xóa */}
                     <Button variant="ghost" size="icon"
-                            className="flex-shrink-0 transition-colors size-8 text-muted-foreground hover:text-destructive">
+                            className="flex-shrink-0 transition-colors size-8 text-muted-foreground hover:text-destructive"
+                    onClick={()=>deleteTask(task._id)}
+                    >
                         <Trash2 className="size-4"/>
                     </Button>
                 </div>
