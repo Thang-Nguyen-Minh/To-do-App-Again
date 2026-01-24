@@ -8,7 +8,7 @@ import {DateTimeFilter} from "@/components/DateTimeFilter.jsx";
 import {Footer} from "@/components/Footer.jsx";
 import {toast} from "sonner";
 import axios from "axios";
-
+import {api} from "@/lib/axios.js";
 export const HomePage = () => {
     const [taskBuffer,setTaskBuffer] = useState([]);
     //Hiển thị task đang làm và đã hoàn thành ở bộ lọc
@@ -22,7 +22,7 @@ export const HomePage = () => {
 
     const fetchTasks = async () => {
         try{
-            const res = await axios.get("http://localhost:8080/api/tasks");
+            const res = await api.get("/tasks");
             setTaskBuffer(res.data.tasks);
             setActiveTaskCount(res.data.activeCount);
             setCompleteTaskCount(res.data.completeCount);
