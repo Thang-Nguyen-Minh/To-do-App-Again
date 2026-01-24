@@ -1,4 +1,4 @@
-import React from "react";
+import React ,{useState}from "react";
 import {Card} from "@/components/ui/card.jsx";
 import {Calendar, CheckCircle, Circle, SquarePen, Trash2} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
@@ -9,8 +9,8 @@ import {api} from "@/lib/axios.js";
 //Tư duy "Nhị phân" (Chỉ cần kiểm tra 1 bên)
 //Coi active là trạng thái mặc định, chỉ cần kiểm tra complete.
 export const TaskCard = ({task,index,handleTaskChanged}) => {
-    let isEditing = false;
-
+    const [isEditing, setIsEditing] = useState(false);
+    const [updateTaskTitle, setUpdateTaskTitle] = useState(task.title || "");
     const deleteTask = async (taskId) => {
         try{
             await api.delete(`tasks/${taskId}`);
@@ -20,6 +20,27 @@ export const TaskCard = ({task,index,handleTaskChanged}) => {
         catch(err){
             console.error("Delete Task unsuccessful",err);
             toast.error("Delete Task  unsuccessful",err.message);
+        }
+    }
+
+    const updateTask = async () => {
+        try{
+            setIsEditing(false);
+            await api.put(`tasks/${task._id}`,{
+                title: updateTaskTitle,
+            });
+            toast.success(`Task has been changed to ${updateTaskTitle}`);
+            handleTaskChanged();
+        }
+        catch(err){
+            console.error("Update Task unsuccessful",err);
+            toast.error("Update Task  unsuccessful",err.message);
+        }
+    }
+
+    const handleKeyPress = (e) => {
+        if (e.key === "Enter") {
+            updateTask();
         }
     }
     return (
@@ -50,6 +71,13 @@ export const TaskCard = ({task,index,handleTaskChanged}) => {
                             placeholder='Cần phải làm gì'
                             className='flex-1 h-12 text-base border-border/50 focus:border-primary/50 focus:ring-primary/20'
                             type='text'
+                            value={updateTaskTitle}
+                            onChange={(e)=>setUpdateTaskTitle(e.target.value)}
+                            onKeyPress={handleKeyPress}
+                            onBlur={() => {
+                                setIsEditing(false);
+                                setUpdateTaskTitle(task.title || "");
+                            }}
                         />
                     ) : (
                         <p className={cn(
@@ -81,7 +109,11 @@ export const TaskCard = ({task,index,handleTaskChanged}) => {
                 <div className="hidden gap-2 group-hover:inline-flex animate-slide-up">
                 {/*    nút edit*/}
                     <Button variant="ghost" size="icon"
-                            className="flex-shrink-0 transition-colors size-8 text-muted-foreground hover:text-info">
+                            className="flex-shrink-0 transition-colors size-8 text-muted-foreground hover:text-info"
+                            onClick={() => {
+                                setIsEditing(true);
+                                setUpdateTaskTitle(task.title || "");
+                            } }>
                         <SquarePen className="size-4"/>
                     </Button>
                 {/*    Nút xóa */}
