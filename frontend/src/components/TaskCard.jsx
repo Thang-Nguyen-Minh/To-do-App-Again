@@ -38,6 +38,30 @@ export const TaskCard = ({task,index,handleTaskChanged}) => {
         }
     }
 
+    const toggleTaskCompleteButton = async () => {
+        try{
+            if (task.status === "active"){
+                await api.put(`tasks/${task._id}`,{
+                    status: "complete",
+                    completedAt: new Date().toISOString(),
+                });
+                toast.success(`${task.title} has been completed`);
+            }
+            else{
+                await api.put(`tasks/${task._id}`,{
+                    status: "active",
+                    completedAt: null
+                });
+                toast.success(`${task.title} has been changed to active`);
+            }
+            handleTaskChanged();
+        }
+        catch(err){
+            console.error("Task has been uncompleted",err);
+            toast.error("Cannot complete task",err.message);
+        }
+    }
+
     const handleKeyPress = (e) => {
         if (e.key === "Enter") {
             updateTask();
@@ -61,6 +85,7 @@ export const TaskCard = ({task,index,handleTaskChanged}) => {
                         task.status === "complete" ? "text-success hover:text-success/80"
                             : "text-muted-foreground hover:text-primary"
                     )}
+                    onClick={toggleTaskCompleteButton}
                 >
                     {task.status === "complete" ? <CheckCircle className="size-5"/> : <Circle className="size-5"/>}
                 </Button>
