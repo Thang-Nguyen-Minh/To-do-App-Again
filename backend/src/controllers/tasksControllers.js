@@ -1,11 +1,32 @@
 import Task from "../models/Task.js";
 
 export const getAllTasks = async (req, res) => {
+    const { filter='today' } = req.query;
+    const now = new Date();
+    let startDate;
+    if(filter === 'today') {
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());//Ngày giờ hiện tại
+    }
+    else if(filter === 'week') {
+        const mondayDate = now.getDate() - (now.getDay() - 1) - (now.getDay() === 0 ? 7 : 0);
+        startDate = new Date(now.getFullYear(), now.getMonth(), mondayDate);
+    }
+    else if(filter === 'month') {
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);//Lấy ngày đầu tháng
+    }
+    else{
+        startDate = null;
+    }
+    //Tạo query để đưa vào mongdb
+    //query : truy vẫn nghĩa là lấy dữ liệu dựa trên yêu cầu
+    const query = startDate ? {createdAt : {$gte: startDate}} : {};
     try{
         const getTask=await Task.find({}).sort({createdAt:-1});
         //Aggregate pipeline để chạy song song cả loadTasks lẫn lọc
         //count đầu là đếm, count 2 là trả về 1 mảng có key là count
-        const result = await Task.aggregate([{
+        const result = await Task.aggregate([
+            {$match: query},
+            {
             $facet : {
                 tasks : [{$sort: {createdAt:-1}}],
                 activeCount : [{$match : {status : "active"}},{$count : "count"}],

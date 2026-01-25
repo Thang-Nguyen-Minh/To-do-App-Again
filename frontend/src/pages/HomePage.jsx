@@ -15,14 +15,16 @@ export const HomePage = () => {
     const [activeTaskCount,setActiveTaskCount] = useState(0);
     const [completeTaskCount,setCompleteTaskCount] = useState(0);
     const [filter, setFilter] = useState("all");
+    //Quản lý giá trị mà người dùng chọn trong combobox
+    const [dateQuery, setDateQuery] = useState("today");
 
     useEffect(()=>{
         fetchTasks();
-    },[])
+    },[dateQuery])
 
     const fetchTasks = async () => {
         try{
-            const res = await api.get("/tasks");
+            const res = await api.get(`/tasks?filter=${dateQuery}`);
             setTaskBuffer(res.data.tasks);
             setActiveTaskCount(res.data.activeCount);
             setCompleteTaskCount(res.data.completeCount);
@@ -79,7 +81,7 @@ export const HomePage = () => {
                     {/*Phân trang*/}
                     <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
                         <Pagi/>
-                        <DateTimeFilter/>
+                        <DateTimeFilter dateQuery={dateQuery} setDateQuery={setDateQuery}/>
                     </div>
                     {/*Chân trang*/}
                     <Footer

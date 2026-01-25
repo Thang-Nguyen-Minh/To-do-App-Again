@@ -11,6 +11,7 @@ import {api} from "@/lib/axios.js";
 export const TaskCard = ({task,index,handleTaskChanged}) => {
     const [isEditing, setIsEditing] = useState(false);
     const [updateTaskTitle, setUpdateTaskTitle] = useState(task.title || "");
+
     const deleteTask = async (taskId) => {
         try{
             await api.delete(`tasks/${taskId}`);
@@ -38,35 +39,40 @@ export const TaskCard = ({task,index,handleTaskChanged}) => {
         }
     }
 
-    const toggleTaskCompleteButton = async () => {
+    //Bật tắt trạng thái
+    //Thì sẽ có logic nữa là khi nào task hoàn thành, má phải nghĩ chứ
+    const toggleTaskCompleteButton = async () =>{
         try{
             if (task.status === "active"){
-                await api.put(`tasks/${task._id}`,{
+                await api.put(`/tasks/${task._id}`,{
                     status: "complete",
-                    completedAt: new Date().toISOString(),
-                });
+                    completedAt : new Date().toISOString(),
+                })
                 toast.success(`${task.title} has been completed`);
             }
             else{
-                await api.put(`tasks/${task._id}`,{
+                await api.put(`/tasks/${task._id}`,{
                     status: "active",
                     completedAt: null
-                });
-                toast.success(`${task.title} has been changed to active`);
+                })
+                toast.success(`${task.title} has changed to active`);
             }
+            //Gọi hàm fetchTasks để giao diện thay đổi
             handleTaskChanged();
         }
         catch(err){
-            console.error("Task has been uncompleted",err);
-            toast.error("Cannot complete task",err.message);
+            console.error("Cannot update status task",err);
+            toast.error("Cannot update status task",err.message);
         }
     }
+
 
     const handleKeyPress = (e) => {
         if (e.key === "Enter") {
             updateTask();
         }
     }
+
     return (
         <Card className={cn(
             "p-4 bg-gradient-card mb-4 border-0 shadow-custom-md hover:shadow-custom-lg transition-all duration-200" +
