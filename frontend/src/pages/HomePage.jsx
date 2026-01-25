@@ -9,6 +9,8 @@ import {Footer} from "@/components/Footer.jsx";
 import {toast} from "sonner";
 import axios from "axios";
 import {api} from "@/lib/axios.js";
+import {visibleTaskLimit} from "@/lib/data.js";
+
 export const HomePage = () => {
     const [taskBuffer,setTaskBuffer] = useState([]);
     //Hiển thị task đang làm và đã hoàn thành ở bộ lọc
@@ -17,11 +19,16 @@ export const HomePage = () => {
     const [filter, setFilter] = useState("all");
     //Quản lý giá trị mà người dùng chọn trong combobox
     const [dateQuery, setDateQuery] = useState("today");
+    //Xem đang ở trang số mấy
+    const [page, setPage] = useState(1);
 
     useEffect(()=>{
         fetchTasks();
     },[dateQuery])
 
+    useEffect(()=>{
+        setPage(1)
+    },[filter,dateQuery])
     const fetchTasks = async () => {
         try{
             const res = await api.get(`/tasks?filter=${dateQuery}`);
@@ -39,6 +46,18 @@ export const HomePage = () => {
         fetchTasks();
     }
 
+    const handleNext = () => {
+        if (page < totalPages) setPage((prev) => prev + 1);
+    }
+
+    const handlePrev = () => {
+        if (page > 1) setPage((prev) => prev - 1);
+    }
+
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+    }
+
     const filteredTask = taskBuffer.filter((task) => {
         if (filter === "active") {
             return task.status==='active'
@@ -48,6 +67,14 @@ export const HomePage = () => {
         }
         else return true;
     })
+
+    const visibleTasks = filteredTask.slice(
+        (page-1)*visibleTaskLimit, page*visibleTaskLimit
+    )
+    if (!visibleTasks.length) {
+        handlePrev();
+    }
+    const totalPages = Math.ceil(filteredTask.length/visibleTaskLimit);
 
     return (
         <div className="min-h-screen w-full bg-[#fefcff] relative">
@@ -75,12 +102,18 @@ export const HomePage = () => {
                         completedTasksCount={completeTaskCount}
                     />
                     {/*Hiển thị task*/}
-                    <TaskList Tasks={filteredTask} trangthaiHienThi={filter}
+                    <TaskList Tasks={visibleTasks} trangthaiHienThi={filter}
                               handleTaskChanged={handleTaskChanged}
                     />
                     {/*Phân trang*/}
                     <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
-                        <Pagi/>
+                        <Pagi
+                            handleNext={handleNext}
+                            handlePrev={handlePrev}
+                            handlePageChange={handlePageChange}
+                            page={page}
+                            totalPages={totalPages}
+                        />
                         <DateTimeFilter dateQuery={dateQuery} setDateQuery={setDateQuery}/>
                     </div>
                     {/*Chân trang*/}
