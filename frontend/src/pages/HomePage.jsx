@@ -7,7 +7,6 @@ import {Pagi} from "@/components/TaskPagination.jsx"
 import {DateTimeFilter} from "@/components/DateTimeFilter.jsx";
 import {Footer} from "@/components/Footer.jsx";
 import {toast} from "sonner";
-import axios from "axios";
 import {api} from "@/lib/axios.js";
 import {visibleTaskLimit} from "@/lib/data.js";
 
