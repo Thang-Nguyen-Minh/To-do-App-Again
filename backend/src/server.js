@@ -5,17 +5,16 @@ import taskRoutes from './routes/tasksRouters.js';
 import cors from 'cors';
 import path from 'path';
 const app = express();
+app.use(cors());
 dotenv.config();
 const PORT = process.env.PORT || 8080;
 const __dirname = path.resolve();
 
-if (process.env.NODE_ENV !== 'production') {
-    app.use(cors());
-}
 app.use(express.json());//chuyển json sang object cho dễ xử lý
+
 app.use("/api/tasks", taskRoutes);
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, "../frontend/dist")));
     app.get('*', (req, res) => {
         res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));

@@ -29,6 +29,7 @@ export const HomePage = () => {
     useEffect(()=>{
         setPage(1)
     },[filter,dateQuery])
+
     const fetchTasks = async () => {
         try{
             const res = await api.get(`/tasks?filter=${dateQuery}`);
@@ -71,7 +72,7 @@ export const HomePage = () => {
     const visibleTasks = filteredTask.slice(
         (page-1)*visibleTaskLimit, page*visibleTaskLimit
     )
-    if (!visibleTasks.length) {
+    if (visibleTasks.length===0) {
         handlePrev();
     }
     const totalPages = Math.ceil(filteredTask.length/visibleTaskLimit);
